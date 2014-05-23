@@ -1,12 +1,16 @@
 (function(){
-	
+		
 	window.Going = {}
 
-	var CONTAINER_ID = 1,ZINDEX = 10000,__EASE_TIMINGFUNCTION = 'ease',__SLIDE_TRANSITION_TIME = '400ms',__SLIDEUP_TRANSITION_TIME = '400ms',__FADE_TRANSITION_TIME = '400ms',PAGE_IS_TRANSIT = false,LAST_PAGE_OBJ = false,PAGE_OBJ_HISTORY = []
+	var CONTAINER_ID = 1,ZINDEX = 10000,__EASE_TIMINGFUNCTION = 'ease',__SLIDE_TRANSITION_TIME = '400ms',__SLIDEUP_TRANSITION_TIME = '400ms',__FADE_TRANSITION_TIME = '400ms',PAGE_IS_TRANSIT = false,LAST_PAGE_OBJ = false,PAGE_OBJ_HISTORY = [],USE_ROUTING = false,ROUTING_OBJ
 	
 
-	Going.mount_container = function(id_or_obj)
+	Going.mount_container = function(id_or_obj , options)
 	{
+		var options = options || {}
+		USE_ROUTING = options.use_routing || false
+		ROUTING_OBJ = options.routing_obj || {}
+
 		if( __is_string(id_or_obj) ) var container_obj = document.getElementById(id_or_obj)
 		else if(!__is_empty(id_or_obj)) var container_obj = id_or_obj
 
@@ -47,6 +51,8 @@
 
 	function __add_page( page_id , options)
 	{
+		var controller = this
+
 		if(!__is_empty(options))
 		{
 			var options = options || {}
@@ -55,6 +61,22 @@
 			options.ignore_exist  = options.ignore_exist  || false
 
 			this.page_arr[page_id] = options
+
+			
+			if(!__is_empty(options.route) && USE_ROUTING)
+			{
+				ROUTING_OBJ.add_route(options.route , function(params , state)
+				{
+					if(this.is_backward)
+					{
+						controller.page_back()
+					}
+					else
+					{
+						controller.go_to_page( page_id , params , state)
+					}
+				})
+			}
 		}
 	}
 	
@@ -183,8 +205,15 @@
 	{
 		var to_page_keyframe,from_page_keyframe,animation_timing_function,animation_duration
 		
-		var transition_type = to_page_obj.page_options.transition_type
-
+		if(is_back)
+		{
+			var transition_type = from_page_obj.page_options.transition_type
+		}
+		else
+		{
+			var transition_type = to_page_obj.page_options.transition_type
+		}
+		
 		switch(transition_type)
 		{
 			case "slide" :
