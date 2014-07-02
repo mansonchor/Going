@@ -6,7 +6,6 @@ define(function(require, exports)
 		
 		var CONTAINER_ID = 1,ZINDEX = 10000,__EASE_TIMINGFUNCTION = 'ease',__SLIDE_TRANSITION_TIME = '400ms',__SLIDEUP_TRANSITION_TIME = '400ms',__FADE_TRANSITION_TIME = '400ms',PAGE_IS_TRANSIT = false,LAST_PAGE_OBJ = false,PAGE_OBJ_HISTORY = [],USE_ROUTING = false,ROUTING_OBJ
 		
-
 		Going.mount_container = function(id_or_obj , options)
 		{
 			var options = options || {}
@@ -32,7 +31,7 @@ define(function(require, exports)
 
 			CONTAINER_ID++
 			
-			//¼àÌıresize
+			//ç›‘å¬resize
 			__resize_listen()
 			
 			return container_property
@@ -86,7 +85,7 @@ define(function(require, exports)
 		{
 			if(PAGE_IS_TRANSIT) return
 			
-			//Ã»ÓĞÀúÊ·¼ÇÂ¼µÄÊ±ºò
+			//æ²¡æœ‰å†å²è®°å½•çš„æ—¶å€™
 			if(PAGE_OBJ_HISTORY.length <= 1 )
 			{
 				return false
@@ -116,7 +115,7 @@ define(function(require, exports)
 			var transition = transition || false
 			
 
-			//Ò³ÃæÎ¨Ò»±êÊ¶
+			//é¡µé¢å”¯ä¸€æ ‡è¯†
 			if(!__is_empty(params))
 			{
 				var params_join_string = params.join("-")
@@ -130,7 +129,7 @@ define(function(require, exports)
 			var page_options = this.page_arr[page_id]
 			
 			var exist_page = document.getElementById(page_identify)
-
+			
 			if(exist_page && page_options.ignore_exist==false)
 			{
 				var page_obj = {}
@@ -148,20 +147,17 @@ define(function(require, exports)
 			}
 
 			__start_page_transition(LAST_PAGE_OBJ , page_obj , false)
-
 			
 			PAGE_OBJ_HISTORY.push(page_obj)
-
-			//console.log(PAGE_OBJ_HISTORY)
 		}
 
 		function __create_page(page_controller,page_id,params,state)
 		{
 			var page_element = document.createElement('div')
-			page_element.style.cssText = 'width:100%;height:100%; position:absolute;visibility:hidden;top:0px;z-index:'+ZINDEX
+			page_element.style.cssText = 'width:100%;height:100%;display:none'
 			
 
-			//Ò³ÃæÎ¨Ò»±êÊ¶
+			//é¡µé¢å”¯ä¸€æ ‡è¯†
 			if(!__is_empty(params))
 			{
 				var params_join_string = params.join("-")
@@ -174,7 +170,7 @@ define(function(require, exports)
 			
 			page_element.id = page_identify
 			
-			//appendµ½ÈİÆ÷
+			//appendåˆ°å®¹å™¨
 			page_controller.container.appendChild(page_element)
 			
 
@@ -187,6 +183,7 @@ define(function(require, exports)
 			page_obj.params = params
 			page_obj.state = state
 			
+
 			//initialize trriger
 			if(__is_function(page_obj.page_options.initialize))
 			{
@@ -202,9 +199,14 @@ define(function(require, exports)
 			return page_obj
 		}
 		
-		//¿ªÊ¼Ò³Ãæ×ª³¡
+		//å¼€å§‹é¡µé¢è½¬åœº
 		function __start_page_transition(from_page_obj , to_page_obj , is_back)
 		{
+			if(from_page_obj && from_page_obj.page_identify == to_page_obj.page_identify)
+			{
+				return false
+			}
+
 			var to_page_keyframe,from_page_keyframe,animation_timing_function,animation_duration
 			
 			if(is_back)
@@ -215,6 +217,9 @@ define(function(require, exports)
 			{
 				var transition_type = to_page_obj.page_options.transition_type
 			}
+			
+			//é’ˆå¯¹ç”¨bodyæ»šåŠ¨çš„SPAï¼Œè½¬åœºåŠ¨ç”»åªèƒ½none
+			transition_type = "none"	
 			
 			switch(transition_type)
 			{
@@ -289,11 +294,14 @@ define(function(require, exports)
 					break
 			}
 			
-			//ÕıÔÚ×ª³¡
+			//æ­£åœ¨è½¬åœº
 			PAGE_IS_TRANSIT = true
 
 			if(to_page_keyframe)
 			{
+				//æå‰è®°å½•é¡µé¢æ»šåŠ¨ä½ç½®
+				var his_scroll = document.body.scrollTop
+
 				//page_before_show trriger
 				if(__is_function(to_page_obj.page_options.page_before_show))
 				{
@@ -304,19 +312,14 @@ define(function(require, exports)
 				var to_page = to_page_obj.page_element
 				
 				
-				setTimeout(function()
-				{
-					to_page.style.top = '0px'
-				},10)
-
-				//½ø³¡Ò³Ãæ
+				//è¿›åœºé¡µé¢
 				to_page.style.webkitAnimationDuration = animation_duration
 				to_page.style.webkitAnimationTimingFunction = animation_timing_function
-				to_page.style.visibility = 'visible'
+				to_page.style.display = ''
 				to_page.style.webkitAnimationName = to_page_keyframe
 				
 
-				//ÍË³¡Ò³Ãæ
+				//é€€åœºé¡µé¢
 				if(from_page_obj)
 				{
 					var from_page = from_page_obj.page_element
@@ -340,7 +343,8 @@ define(function(require, exports)
 
 					if(from_page_obj)
 					{
-						from_page.style.top = "-3000px"
+						from_page.setAttribute('his_scroll' , his_scroll)
+						from_page.style.display = "none"
 						
 						//page_hide trriger
 						if( __is_function(from_page_obj.page_options.page_hide) )
@@ -348,7 +352,8 @@ define(function(require, exports)
 							from_page_obj.page_options.page_hide.call(from_page_obj)
 						}
 						
-						//ÒÆ³ıÒ³Ãæ
+
+						//ç§»é™¤é¡µé¢
 						if(from_page_obj.page_options.dom_not_cache==true && is_back)
 						{
 							from_page.parentNode && from_page.parentNode.removeChild(from_page)
@@ -358,6 +363,19 @@ define(function(require, exports)
 					LAST_PAGE_OBJ = to_page_obj
 					
 				},parseInt(animation_duration))
+
+
+				setTimeout(function(){
+
+					if(to_page.getAttribute('his_scroll'))
+					{
+						document.body.scrollTop = to_page.getAttribute('his_scroll')
+					}
+					else
+					{
+						document.body.scrollTop = 0
+					}
+				},20)
 			}
 		}
 		
@@ -397,7 +415,7 @@ define(function(require, exports)
 			return true
 		}
 
-		function __getElementsByClassName(searchClass, node,tag) 
+		/*function __getElementsByClassName(searchClass, node,tag) 
 		{
 			if(document.getElementsByClassName)
 			{
@@ -442,7 +460,7 @@ define(function(require, exports)
 			
 				return result;
 			}
-		}
+		}*/
 		
 	})(Going)
 
