@@ -5,6 +5,10 @@ Going
 
 单纯处理页面控制，做最简单的业务抽象
 
+- 自带页面显隐切换处理和页面规则控制
+- 支持页面历史记录和无限级深入访问路径
+- 可脱离路由映射单独使用，也可配合**Routing**实现整套 [SPA页面控制解决方案](https://github.com/mansonchor/Going-Routing-)
+
 ##主要API说明：
 
 ###Going.mount_container( container_id_or_obj , [options] )
@@ -46,11 +50,11 @@ var page_controler = Going.mount_container('page-container' , { use_routing : tr
 
 @**return** {null} 
 
-@**param** {string} page_id ： 页面的ID，作为一个独立页面的唯一标识
+@**param** {string} page_id ： 页面的ID
 
 @**param** {json} page_options
 
->{string}  **route** ： 页面匹配的路由规则
+>{string}  **route** ： 路由规则，假如绑定Routing使用，每个页面都必须独立配置路由规则，当路由变化时会自动匹配对应页面并创建显示
 
 ```javascript
 page_options.route = "index"
@@ -137,7 +141,7 @@ page_options.window_scroll : function(judge)
 }
 ```
 
-###事件触发
+####事件触发
 在 `page_init` `page_before_show` `page_show` `window_change` 等的事件回调中，会带上一些状态参数，方便业务使用
 
 ```javascript
@@ -150,3 +154,24 @@ page_options.page_init = function()
     console.log(this.page_identify)       //页面的唯一标识，靠它来判断页面是否已经存在，组织规则是：page_id + params
 }
 ```
+
+
+###page_controler.go_to_page(page_id , params , state)
+
+根据page_id切换到对应页面，假如绑定了Routing，不需要人工去调用该API，会根据路由变化映射进行对应的页面切换处理
+
+@**return** {null} 
+
+@**param** {string} page_id ： 页面的ID
+
+@**param** {array} params  参数数组（一般是页面里的必须参数）
+
+@**state** {json} state   无状态参数（作为辅助参数，不是必须）
+
+
+###page_controler.page_back()
+
+返回上一页面，假如绑定了Routing，不需要人工去调用该API
+
+@**return** {null} 
+
