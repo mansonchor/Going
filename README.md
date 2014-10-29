@@ -27,7 +27,7 @@ Routing.initialize()
 var page_controler = Going.mount_container('page-container' , { use_routing : true , routing_obj : Routing , listen_scroll : true })
 ```
 
-**Routing为另外一个独立路由控制模块，可[参考这里]**(https://github.com/mansonchor/Routing)
+**Routing为另外一个独立路由控制模块，可[参考这里](https://github.com/mansonchor/Routing)**
 
 
 ##page_controler对象
@@ -35,6 +35,12 @@ var page_controler = Going.mount_container('page-container' , { use_routing : tr
 ###page_controler.container     
 
 容器dom obj
+
+###page_controler.page_identify     
+
+page的唯一标识，是用来判断页面是否已经存在的关键
+
+组织规则是：page_id + params
 
 ###page_controler.page_arr      
 
@@ -80,6 +86,60 @@ options.page_init = function()
 	//params是一个数组，依次是url传递的参数
 	var cat_id = this.params[0]    //url的第一个参数，即cat_id
 	var art_id = this.params[1]    //url的第二个参数，即art_id
+}
+```
+
+>{bool}  **dom_not_cache** [defalut false]： 当前页面返回上一页面后，是否把该页从dom remove掉
+
+>{bool}  **ignore_exist** [defalut false]： 当路由到该页面已经存在时，是否忽略存在再另外新建一个页面
+
+这里几个情况要说明一下：
+
+1.一些静态的页面，创建了之后建议保留下来；需要每次动态获取数据的页面，可以设置成true
+
+2.当路由到一个页面时，Going会自动判断是否已经存在，假如存在将不会重新创建一个新页面，除非 **ignore_exist为true**
+
+3.路由到一个存在的页面时，**不会触发 page_init 监听**
+
+~~>{emum} **transition_type** [ none , slide  , slide reverse , slideup , fade ] ：页面的转场效果~~  **由于性能和体验问题，已弃用**
+
+>{function} **initialize** ： 如果定义了该函数，页面view创建时会调用
+
+一般用作page框架render
+
+>{function} **page_init** ： 如果定义了该函数，页面view创建时会调用
+
+它的调用在initialize之后，一般用作异步获取数据等操作
+
+>{function} **page_before_show** ： 如果定义了该函数，页面在进入可视区域前会调用
+
+>{function} **page_show** ： 如果定义了该函数，页面在完全进入可视区域后会调用
+
+它和 page_before_show 的调用时机差别，在于转场效果会占用一定的动画时间
+假如没有转场效果，理论上 page_before_show 和 page_show 的调用时间一致
+
+
+>{function} **page_before_hide** ： 如果定义了该函数，页面在退出可视区域前会调用
+
+>{function} **page_hide** ： 如果定义了该函数，页面在完全退出可视区域后会调用
+
+两个页面之间的切换，进场页面的 page_show 是呼应着退场页面的 page_hide 的
+
+>{function} **window_change** ： 如果定义了该函数，在屏幕大小变化时会触发当前激活页面该函数，其它隐藏页面不会触发
+
+例如：手机横竖屏变化、某些浏览器导航条的折叠等，都会引发
+
+>{function} **window_scroll** ： 如果定义了该函数，在浏览器滚动时会触发当前激活页面该函数，其它隐藏页面不会触发
+
+window_scroll会返回一些参数
+
+```javascript
+options.window_scroll : function(judge)
+{
+	if(judge.nearBottom)
+	{
+		//滚动接近底部
+	}
 }
 ```
 
