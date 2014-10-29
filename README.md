@@ -13,7 +13,7 @@ Going
 
 ###Going.mount_container( container_id_or_obj , [options] )
 
-@**return** {obj} page_controler ： page_controler控制对象，这个对象提供页面控制的所有方法
+@**return** {obj} **page_controler** ： **page_controler**控制对象，这个对象提供页面控制的所有方法
 
 @**param** {string | dom obj} container_id_or_obj ： 承载页面的容器
 
