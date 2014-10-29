@@ -1,9 +1,13 @@
-(function(){
-		
-	window.Going = {}
+/*
+ * going.js
+ * @version 0.6.0
+ */
+var Going = {}
 
-	var CONTAINER_ID = 1,ZINDEX = 10000,__EASE_TIMINGFUNCTION = 'ease',__SLIDE_TRANSITION_TIME = '400ms',__SLIDEUP_TRANSITION_TIME = '400ms',__FADE_TRANSITION_TIME = '400ms',PAGE_IS_TRANSIT = false,LAST_PAGE_OBJ = false,PAGE_OBJ_HISTORY = [],USE_ROUTING = false,ROUTING_OBJ
-		
+;(function(){
+	
+	var CONTAINER_ID = 1,ZINDEX = 10000,__EASE_TIMINGFUNCTION = 'ease',__SLIDE_TRANSITION_TIME = '400ms',__SLIDEUP_TRANSITION_TIME = '400ms',__FADE_TRANSITION_TIME = '400ms',PAGE_IS_TRANSIT = false,LAST_PAGE_OBJ = false,PAGE_OBJ_HISTORY = [],USE_ROUTING = false,ROUTING_OBJ,SCROLL_TIMEOUT_HANDLE
+	
 	Going.mount_container = function(id_or_obj , options)
 	{
 		var options = options || {}
@@ -31,10 +35,43 @@
 		
 		//监听resize
 		__resize_listen()
+
+		//监听浏览器滚动条 scroll
+		if(options.listen_scroll)
+		{
+			__scroll_listen()
+		}
 		
 		return container_property
 	}
 
+	function __scroll_listen()
+	{
+		window.addEventListener('scroll', function()
+		{
+			if(SCROLL_TIMEOUT_HANDLE) clearTimeout(SCROLL_TIMEOUT_HANDLE)
+
+			SCROLL_TIMEOUT_HANDLE = setTimeout(function()
+			{
+				if(__is_function(LAST_PAGE_OBJ.page_options.window_scroll))
+				{
+					var nearBottom = false
+					var total_height = document.body.scrollHeight
+					var scroll_height = document.body.scrollTop
+					var screen_height = document.documentElement.clientHeight
+
+					//必须要页面大于1屏
+					if(total_height > screen_height && total_height - scroll_height <= screen_height + 50)	//50换缓冲
+					{
+						nearBottom = true
+					}
+
+					LAST_PAGE_OBJ.page_options.window_scroll.call(LAST_PAGE_OBJ,{ nearBottom: nearBottom })
+				}
+			},300)
+
+		}, false)
+	}
 
 	function __resize_listen()
 	{
@@ -365,13 +402,15 @@
 
 			setTimeout(function(){
 
-				if(to_page.getAttribute('his_scroll'))
+				var his_scroll = to_page.getAttribute('his_scroll')
+
+				if(his_scroll && his_scroll > 0)
 				{
 					document.body.scrollTop = to_page.getAttribute('his_scroll')
 				}
 				else
 				{
-					document.body.scrollTop = 0
+					document.body.scrollTop = 1
 				}
 			},20)
 		}
@@ -412,52 +451,7 @@
 		for (var key in obj) if (__has_key(obj, key)) return false
 		return true
 	}
-
-	/*function __getElementsByClassName(searchClass, node,tag) 
-	{
-		if(document.getElementsByClassName)
-		{
-			var nodes =  (node || document).getElementsByClassName(searchClass),result = [];
-			for(var i=0 ;node = nodes[i++];)
-			{
-				if(tag !== "*" && node.tagName === tag.toUpperCase())
-				{
-					result.push(node)
-				}
-			}
-			
-			return result
-		}
-		else
-		{
-			node = node || document;
-			tag = tag || "*";
-			var classes = searchClass.split(" "),
-			elements = (tag === "*" && node.all)? node.all : node.getElementsByTagName(tag),
-			patterns = [],
-			current,
-			match;
-			var i = classes.length;
-			while(--i >= 0)
-			{
-				patterns.push(new RegExp("(^|\\s)" + classes[i] + "(\\s|$)"));
-			}
-			var j = elements.length;
-
-			while(--j >= 0)
-			{
-				current = elements[j];
-				match = false;
-				for(var k=0, kl=patterns.length; k<kl; k++)
-				{
-					match = patterns[k].test(current.className);
-					if (!match)  break;
-				}
-				if (match)  result.push(current);
-			}
-		
-			return result;
-		}
-	}*/
 	
-})()
+})(Going)
+
+module.exports = Going;
