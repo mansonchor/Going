@@ -36,17 +36,11 @@ var page_controler = Going.mount_container('page-container' , { use_routing : tr
 
 容器dom obj
 
-###page_controler.page_identify     
-
-page的唯一标识，是用来判断页面是否已经存在的关键
-
-组织规则是：page_id + params
-
 ###page_controler.page_arr      
 
 所有的page对象
 
-###page_controler.add_page(page_id , options)
+###page_controler.add_page(page_id , page_options)
 
 往控制器添加一个page，page可以设定各种参数和监听事件
 
@@ -54,34 +48,34 @@ page的唯一标识，是用来判断页面是否已经存在的关键
 
 @**param** {string} page_id ： 页面的ID，作为一个独立页面的唯一标识
 
-@**param** {json} options
+@**param** {json} page_options
 
 >{string}  **route** ： 页面匹配的路由规则
 
 ```javascript
-options.route = "index"
+page_options.route = "index"
 ```
 也可以组建带参数的url hash
 ```javascript
-options.route = "last/:art_id"    //能匹配 #last/1000 等url hash
+page_options.route = "last/:art_id"    //能匹配 #last/1000 等url hash
 
-options.route = "cat/:cat_id/:art_id"    //能匹配 #cat/2/1000 等url hash
+page_options.route = "cat/:cat_id/:art_id"    //能匹配 #cat/2/1000 等url hash
 ```
 
 也可通过()设置非强制参数
 ```javascript
-options.route = "hot/(:is_big_img)"    //能匹配 #hot 和 #hot/true
+page_options.route = "hot/(:is_big_img)"    //能匹配 #hot 和 #hot/true
 
-options.route = "cat/:cat_id/(:art_id)"    //能匹配 #cat/2/1000 和 #cat/2
+page_options.route = "cat/:cat_id/(:art_id)"    //能匹配 #cat/2/1000 和 #cat/2
 ```
 
 url参数可在页面的 `page_init` `page_show` 等事件监听下接收
 
 ```
 //页面路由配置
-options.route = "cat/:cat_id/(:art_id)"
+page_options.route = "cat/:cat_id/(:art_id)"
 
-options.page_init = function()
+page_options.page_init = function()
 {
 	//params是一个数组，依次是url传递的参数
 	var cat_id = this.params[0]    //url的第一个参数，即cat_id
@@ -134,7 +128,7 @@ options.page_init = function()
 window_scroll会返回一些参数
 
 ```javascript
-options.window_scroll : function(judge)
+page_options.window_scroll : function(judge)
 {
 	if(judge.nearBottom)
 	{
@@ -143,3 +137,16 @@ options.window_scroll : function(judge)
 }
 ```
 
+###事件触发
+在 `page_init` `page_before_show` `page_show` `window_change` 等的事件回调中，会带上一些状态参数，方便业务使用
+
+```javascript
+page_options.page_init = function()
+{
+    console.log(this.page_element)        //page的最外层dom
+    console.log(this.params)           	  //url hash参数
+    console.log(this.state)               //页面间传递的无状态参数
+    console.log(this.page_options)        //page_options本身
+    console.log(this.page_identify)       //页面的唯一标识，靠它来判断页面是否已经存在，组织规则是：page_id + params
+}
+```
