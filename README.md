@@ -66,6 +66,7 @@ page_options.route = "last/:art_id"    //能匹配 #last/1000 等url hash
 page_options.route = "cat/:cat_id/:art_id"    //能匹配 #cat/2/1000 等url hash
 ```
 
+
 也可通过()设置非强制参数
 ```javascript
 page_options.route = "hot/(:is_big_img)"    //能匹配 #hot 和 #hot/true
