@@ -1,6 +1,6 @@
 /*
  * going.js
- * @version 0.6.0
+ * @version 0.7.0
  */
 var Going = {}
 
@@ -58,10 +58,10 @@ var Going = {}
 					var nearBottom = false
 					var total_height = document.body.scrollHeight
 					var scroll_height = document.body.scrollTop
-					var screen_height = document.documentElement.clientHeight
+					var screen_height = window.innerHeight
 
 					//必须要页面大于1屏
-					if(total_height > screen_height && total_height - scroll_height <= screen_height + 50)	//50换缓冲
+					if(scroll_height > screen_height && screen_height + scroll_height >= total_height - 50)	//50换缓冲
 					{
 						nearBottom = true
 					}
@@ -211,8 +211,9 @@ var Going = {}
 
 		var page_obj = {}
 		
+
 		page_obj.page_element = page_element
-		page_obj.page_options = page_controller.page_arr[page_id]
+		page_obj.page_options = __clone_obj(page_controller.page_arr[page_id])
 		page_obj.page_id = page_id
 		page_obj.page_identify = page_identify
 		page_obj.params = params
@@ -450,6 +451,15 @@ var Going = {}
 		if (__is_array(obj) || __is_string(obj)) return obj.length === 0
 		for (var key in obj) if (__has_key(obj, key)) return false
 		return true
+	}
+
+	function __clone_obj(myObj)
+	{
+		if(typeof(myObj) != 'object') return myObj; 
+	    if(myObj == null) return myObj; 
+	    var myNewObj = new Object(); 
+	    for(var i in myObj) myNewObj[i] = __clone_obj(myObj[i]); 
+	    return myNewObj;
 	}
 	
 })(Going)
