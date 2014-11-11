@@ -2,7 +2,7 @@
   "name": "Going",
   "repo": "mansonchor/Going",
   "description": "",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "keywords": ["Going"],
   "scripts": ["index.js"],
   "license": "MIT"
