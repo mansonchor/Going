@@ -1,6 +1,7 @@
 /*
  * going.js
- * @version 0.7.0
+ * @version 0.8.0
+ * 修改了page_options回调的方式，让this更统一的操作
  */
 var Going = {}
 
@@ -66,7 +67,7 @@ var Going = {}
 						nearBottom = true
 					}
 
-					LAST_PAGE_OBJ.page_options.window_scroll.call(LAST_PAGE_OBJ,{ nearBottom: nearBottom })
+					LAST_PAGE_OBJ.page_options.window_scroll.call(LAST_PAGE_OBJ.page_options ,{ nearBottom: nearBottom })
 				}
 			},300)
 
@@ -79,7 +80,7 @@ var Going = {}
 		{
 			if(__is_function(LAST_PAGE_OBJ.page_options.window_change))
 			{
-				LAST_PAGE_OBJ.page_options.window_change.call(LAST_PAGE_OBJ)
+				LAST_PAGE_OBJ.page_options.window_change.call(LAST_PAGE_OBJ.page_options , LAST_PAGE_OBJ)
 			}
 
 		}, false)
@@ -223,13 +224,13 @@ var Going = {}
 		//initialize trriger
 		if(__is_function(page_obj.page_options.initialize))
 		{
-			page_obj.page_options.initialize.call(page_obj,params,state)
+			page_obj.page_options.initialize.call(page_obj.page_options , page_obj)
 		}
 		
 		//page_init trriger
 		if(__is_function(page_obj.page_options.page_init))
 		{
-			page_obj.page_options.page_init.call(page_obj,params,state)
+			page_obj.page_options.page_init.call(page_obj.page_options , page_obj)
 		}
 
 		return page_obj
@@ -341,9 +342,8 @@ var Going = {}
 			//page_before_show trriger
 			if(__is_function(to_page_obj.page_options.page_before_show))
 			{
-				to_page_obj.page_options.page_before_show.call(to_page_obj)
+				to_page_obj.page_options.page_before_show.call(to_page_obj.page_options, to_page_obj)
 			}
-
 
 			var to_page = to_page_obj.page_element
 			
@@ -374,7 +374,7 @@ var Going = {}
 				//page_before_show trriger
 				if(__is_function(to_page_obj.page_options.page_show))
 				{
-					to_page_obj.page_options.page_show.call(to_page_obj)
+					to_page_obj.page_options.page_show.call(to_page_obj.page_options, to_page_obj)
 				}
 
 				if(from_page_obj)
@@ -385,7 +385,7 @@ var Going = {}
 					//page_hide trriger
 					if( __is_function(from_page_obj.page_options.page_hide) )
 					{
-						from_page_obj.page_options.page_hide.call(from_page_obj)
+						from_page_obj.page_options.page_hide.call(from_page_obj.page_options, from_page_obj)
 					}
 					
 
